@@ -46,7 +46,10 @@ class ConnectionManager : NSObject, URLSessionWebSocketDelegate {
         }
     }
     
-    public func connect() {
+    public func connect(_ newUrl: URL? = nil) {
+        if let nUrl = newUrl {
+            wsURL = nUrl
+        }
         webSocketTask?.cancel(with: .goingAway, reason: "Restaring connection".data(using: .utf8))
         print("Connecting")
         let configuration = URLSessionConfiguration.default

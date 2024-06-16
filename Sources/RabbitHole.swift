@@ -145,10 +145,14 @@ public class RabbitHole: ObservableObject {
         }
     }
     
-    public func reconnect() {
+    public func reconnect(_ newUrl: URL? = nil) {
         self.wsStatus = .connecting
         internalHasCredentials()
-        self.connectionManager?.connect()
+        if let url = newUrl {
+            self.connectionManager?.connect(url)
+        } else {
+            self.connectionManager?.connect()
+        }
     }
     
     public func refreshStatus() {
