@@ -14,6 +14,7 @@ enum ResponsePacketType: String, Codable {
     case audio
     case register
     case long
+    case meeting
 }
 
 struct BasicResponsePacket: Codable {

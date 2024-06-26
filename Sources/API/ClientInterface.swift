@@ -13,6 +13,7 @@ enum RequestPacketType: String, Codable {
     case ptt
     case audio
     case register
+    case meeting
 }
 
 struct BasicRequestPacket: Codable {

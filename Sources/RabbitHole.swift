@@ -53,6 +53,7 @@ public class RabbitHole: ObservableObject {
     @Published public var isAuthenticated = false
     @Published public var isAuthenticating = false
     @Published public var canAuthenticate = false
+    @Published public var isMeetingActive = false
     
     @Published public var hasCredentials = false
     
@@ -93,6 +94,14 @@ public class RabbitHole: ObservableObject {
         self.connectionManager?.sendMessage(RequestPacket(
             type: .register,
             data: url.absoluteString
+        ))
+    }
+    
+    public func stopMeeting() {
+        guard isMeetingActive && wsStatus == .open else { return }
+        self.connectionManager?.sendMessage(RequestPacket(
+            type: .meeting,
+            data: false
         ))
     }
     
@@ -178,6 +187,7 @@ public class RabbitHole: ObservableObject {
         }, onConnect: {
             DispatchQueue.main.async {
                 self.wsStatus = .open
+                self.isMeetingActive = false
             }
             print("Connected to Rabbithole")
             self.addMessage(ChatMessage(
@@ -286,7 +296,6 @@ public class RabbitHole: ObservableObject {
             ))
         case .long:
             guard let longResponse = try? jsonDecoder.decode(ResponsePacket<ResponseLong>.self, from: data) else { return }
-            print(longResponse)
             lastImages = longResponse.data.images
             addMessage(ChatMessage(
                 author: .rabbit,
@@ -296,6 +305,11 @@ public class RabbitHole: ObservableObject {
                     .data(using: .utf8) ?? Data()
                 )
             )
+        case .meeting:
+            guard let meetingResponse = try? jsonDecoder.decode(ResponsePacket<Bool>.self, from: data) else { return }
+            DispatchQueue.main.async {
+                self.isMeetingActive = meetingResponse.data
+            }
         }
     }
 }
