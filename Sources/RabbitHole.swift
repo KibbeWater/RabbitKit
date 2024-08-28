@@ -139,6 +139,14 @@ public class RabbitHole: ObservableObject {
         hasCredentials = false
     }
     
+    public func getCredentials() -> (imei: String, accountKey: String)? {
+        guard hasCredentials else { return nil }
+        let imei = self.keychain.read(forKey: "imei")
+        let accountKey = self.keychain.read(forKey: "accountKey")
+        if imei?.isEmpty == true || accountKey?.isEmpty == true { return nil }
+        return (imei!, accountKey!)
+    }
+    
     func internalHasCredentials() {
         guard let imei = self.keychain.read(forKey: "imei"),
               let accountKey = self.keychain.read(forKey: "accountKey") else {
